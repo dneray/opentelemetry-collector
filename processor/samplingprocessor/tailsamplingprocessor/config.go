@@ -62,7 +62,7 @@ type PolicyCfg struct {
 
 type ProbabilisticSamplingCfg struct {
 	SamplingPercentage float32 `mapstructure:"sampling_percentage"`
-	HashSeed int `mapstructure:"hash_seed"`
+	HashSeed uint32 `mapstructure:"hash_seed"`
 }
 
 // DurationCfg holds the configurable settings to create a filter based on the duration

@@ -36,6 +36,9 @@ const (
 	RateLimiting PolicyType = "rate_limiting"
 	// Sample traces where the latency fell between a certain range
 	DurationAttribute PolicyType = "duration"
+	// Sample traces randomly
+
+	ProbabilisticSample PolicyType = "probabilistic"
 )
 
 // PolicyCfg holds the common configuration to all policies.
@@ -52,8 +55,16 @@ type PolicyCfg struct {
 	RateLimitingCfg RateLimitingCfg `mapstructure:"rate_limiting"`
 	// Config for duration filter sampling policy evaluator
 	DurationCfg DurationCfg `mapstructure:"duration"`
+	// Config pr
+	ProbabilisticCfg ProbabilisticSamplingCfg `mapstructure:"probabilistic"`
 
 }
+
+type ProbabilisticSamplingCfg struct {
+	SamplingPercentage float32 `mapstructure:"sampling_percentage"`
+	HashSeed int `mapstructure:"hash_seed"`
+}
+
 // DurationCfg holds the configurable settings to create a filter based on the duration
 // sampling policy evaluator.
 type DurationCfg struct {

@@ -134,6 +134,9 @@ func getPolicyEvaluator(logger *zap.Logger, cfg *PolicyCfg) (sampling.PolicyEval
 	case DurationAttribute:
 		rlfCfg := cfg.DurationCfg
 		return sampling.NewDurationFilter(logger, rlfCfg.MinValue, rlfCfg.MaxValue), nil
+	case ProbabilisticSample:
+		realCfg := cfg.ProbabilisticCfg
+		return sampling.NewProbabilisticFilter(logger, realCfg.SamplingPercentage, realCfg.HashSeed), nil
 	default:
 		return nil, fmt.Errorf("unknown sampling policy type %s", cfg.Type)
 	}

@@ -34,6 +34,11 @@ processors:
             name: test-policy-5,
             type: duration,
             duration: {min_value_ms: 100, max_value_ms: 10000}
+         },
+         {
+            name: test-policy-6,
+            type: probabilistic,
+            probabilistic: {sampling_percentage: 15.3, hash_seed: 22}
          }
       ]
 

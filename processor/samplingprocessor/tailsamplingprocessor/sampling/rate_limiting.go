@@ -78,7 +78,7 @@ func (r *rateLimiting) Evaluate(traceID []byte, trace *TraceData) (Decision, err
 
 		spansInMinuteIfSampled := r.spansInCurrentMinute + trace.SpanCount
 		if spansInMinuteIfSampled < r.spansPerMinute {
-			r.spansInCurrentSecond = spansInMinuteIfSampled
+			r.spansInCurrentMinute = spansInMinuteIfSampled
 			return Sampled, nil
 		}
 	}

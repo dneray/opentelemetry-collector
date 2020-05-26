@@ -36,6 +36,9 @@ func NewStringAttributeFilter(logger *zap.Logger, key string, values []string) P
 			valuesMap[value] = struct{}{}
 		}
 	}
+	if len(values) == 0 {
+		valuesMap = nil
+	}
 	return &stringAttributeFilter{
 		key:    key,
 		values: valuesMap,
@@ -62,6 +65,9 @@ func (saf *stringAttributeFilter) Evaluate(traceID []byte, trace *TraceData) (De
 		node := batch.Node
 		if node != nil && node.Attributes != nil {
 			if v, ok := node.Attributes[saf.key]; ok {
+				if saf.values == nil {
+					return Sampled, nil
+				}
 				if _, ok := saf.values[v]; ok {
 					return Sampled, nil
 				}
@@ -74,6 +80,9 @@ func (saf *stringAttributeFilter) Evaluate(traceID []byte, trace *TraceData) (De
 			if v, ok := span.Attributes.AttributeMap[saf.key]; ok {
 				truncableStr := v.GetStringValue()
 				if truncableStr != nil {
+					if saf.values == nil {
+						return Sampled, nil
+					}
 					if _, ok := saf.values[truncableStr.Value]; ok {
 						return Sampled, nil
 					}

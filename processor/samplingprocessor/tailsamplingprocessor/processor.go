@@ -131,6 +131,9 @@ func getPolicyEvaluator(logger *zap.Logger, cfg *PolicyCfg) (sampling.PolicyEval
 	case RateLimiting:
 		rlfCfg := cfg.RateLimitingCfg
 		return sampling.NewRateLimiting(logger, rlfCfg.SpansPerSecond), nil
+	case DurationAttribute:
+		rlfCfg := cfg.DurationCfg
+		return sampling.NewDurationFilter(logger, rlfCfg.MinValue, rlfCfg.MaxValue), nil
 	default:
 		return nil, fmt.Errorf("unknown sampling policy type %s", cfg.Type)
 	}
@@ -149,6 +152,7 @@ func (tsp *tailSamplingSpanProcessor) samplingPolicyOnTick() {
 			continue
 		}
 		trace := d.(*sampling.TraceData)
+
 		trace.DecisionTime = time.Now()
 		for i, policy := range tsp.policies {
 			policyEvaluateStartTime := time.Now()

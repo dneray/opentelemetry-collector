@@ -34,6 +34,8 @@ const (
 	StringAttribute PolicyType = "string_attribute"
 	// RateLimiting allows all traces until the specified limits are satisfied.
 	RateLimiting PolicyType = "rate_limiting"
+	// Sample traces where the latency fell between a certain range
+	DurationAttribute PolicyType = "duration"
 )
 
 // PolicyCfg holds the common configuration to all policies.
@@ -48,6 +50,17 @@ type PolicyCfg struct {
 	StringAttributeCfg StringAttributeCfg `mapstructure:"string_attribute"`
 	// Configs for rate limiting filter sampling policy evaluator.
 	RateLimitingCfg RateLimitingCfg `mapstructure:"rate_limiting"`
+	// Config for duration filter sampling policy evaluator
+	DurationCfg DurationCfg `mapstructure:"duration"`
+
+}
+// DurationCfg holds the configurable settings to create a filter based on the duration
+// sampling policy evaluator.
+type DurationCfg struct {
+	// MinValue is optional to set the min value for the duration in ms to be considered a match
+	MinValue *int64 `mapstructure:"min_value_ms"`
+	// MaxValue is optional to set the max value for the duration in ms to be considered a match
+	MaxValue *int64 `mapstructure:"max_value_ms"`
 }
 
 // NumericAttributeCfg holds the configurable settings to create a numeric attribute filter

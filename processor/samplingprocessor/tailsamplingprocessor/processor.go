@@ -157,7 +157,7 @@ func (tsp *tailSamplingSpanProcessor) samplingPolicyOnTick() {
 		trace := d.(*sampling.TraceData)
 
 		trace.DecisionTime = time.Now()
-		for i, policy := range tsp.policies {
+		policyLoop: for i, policy := range tsp.policies {
 			policyEvaluateStartTime := time.Now()
 			decision, err := policy.Evaluator.Evaluate(id, trace)
 			stats.Record(
@@ -188,6 +188,7 @@ func (tsp *tailSamplingSpanProcessor) samplingPolicyOnTick() {
 				for j := 0; j < len(traceBatches); j++ {
 					tsp.nextConsumer.ConsumeTraceData(policy.ctx, traceBatches[j])
 				}
+				break policyLoop
 			case sampling.NotSampled:
 				stats.RecordWithTags(
 					policy.ctx,

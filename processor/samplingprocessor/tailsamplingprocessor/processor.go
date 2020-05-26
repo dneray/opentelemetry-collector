@@ -130,7 +130,7 @@ func getPolicyEvaluator(logger *zap.Logger, cfg *PolicyCfg) (sampling.PolicyEval
 		return sampling.NewStringAttributeFilter(logger, safCfg.Key, safCfg.Values), nil
 	case RateLimiting:
 		rlfCfg := cfg.RateLimitingCfg
-		return sampling.NewRateLimiting(logger, rlfCfg.SpansPerSecond), nil
+		return sampling.NewRateLimiting(logger, rlfCfg.SpansPerSecond, rlfCfg.SpansPerMinute), nil
 	case DurationAttribute:
 		rlfCfg := cfg.DurationCfg
 		return sampling.NewDurationFilter(logger, rlfCfg.MinValue, rlfCfg.MaxValue), nil

@@ -26,14 +26,18 @@ type rateLimiting struct {
 	spansInCurrentSecond int64
 	spansPerSecond       int64
 	logger               *zap.Logger
+	spansPerMinute       int64
+	spansInCurrentMinute int64
+	currentMinute        int
 }
 
 var _ PolicyEvaluator = (*rateLimiting)(nil)
 
 // NewRateLimiting creates a policy evaluator the samples all traces.
-func NewRateLimiting(logger *zap.Logger, spansPerSecond int64) PolicyEvaluator {
+func NewRateLimiting(logger *zap.Logger, spansPerSecond, spansPerMinute int64) PolicyEvaluator {
 	return &rateLimiting{
 		spansPerSecond: spansPerSecond,
+		spansPerMinute: spansPerMinute,
 		logger:         logger,
 	}
 }
@@ -51,15 +55,32 @@ func (r *rateLimiting) OnLateArrivingSpans(earlyDecision Decision, spans []*trac
 func (r *rateLimiting) Evaluate(traceID []byte, trace *TraceData) (Decision, error) {
 	r.logger.Debug("Evaluating spans in rate-limiting filter")
 	currSecond := time.Now().Unix()
-	if r.currentSecond != currSecond {
-		r.currentSecond = currSecond
-		r.spansInCurrentSecond = 0
+	currMinute := time.Now().Minute()
+
+	if r.spansPerSecond != 0 {
+		if r.currentSecond != currSecond {
+			r.currentSecond = currSecond
+			r.spansInCurrentSecond = 0
+		}
+
+		spansInSecondIfSampled := r.spansInCurrentSecond + trace.SpanCount
+		if spansInSecondIfSampled < r.spansPerSecond {
+			r.spansInCurrentSecond = spansInSecondIfSampled
+			return Sampled, nil
+		}
 	}
 
-	spansInSecondIfSampled := r.spansInCurrentSecond + trace.SpanCount
-	if spansInSecondIfSampled < r.spansPerSecond {
-		r.spansInCurrentSecond = spansInSecondIfSampled
-		return Sampled, nil
+	if r.spansPerMinute != 0 {
+		if r.currentMinute != currMinute {
+			r.currentMinute = currMinute
+			r.spansInCurrentMinute = 0
+		}
+
+		spansInMinuteIfSampled := r.spansInCurrentMinute + trace.SpanCount
+		if spansInMinuteIfSampled < r.spansPerMinute {
+			r.spansInCurrentSecond = spansInMinuteIfSampled
+			return Sampled, nil
+		}
 	}
 
 	return NotSampled, nil

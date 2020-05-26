@@ -99,6 +99,9 @@ type StringAttributeCfg struct {
 type RateLimitingCfg struct {
 	// SpansPerSecond sets the limit on the maximum nuber of spans that can be processed each second.
 	SpansPerSecond int64 `mapstructure:"spans_per_second"`
+
+	// Limit on number of spans processed in a minute
+	SpansPerMinute int64 `mapstructure:"spans_per_minute"`
 }
 
 // Config holds the configuration for tail-based sampling.
